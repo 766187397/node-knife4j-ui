@@ -58,9 +58,9 @@ export class Knife4jDoc {
    * ```javascript
    * const knife4jDoc = new Knife4jDoc(swaggerSpec);
    * const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
-   * 静态文件为'/', 则不需要传prefix
+   * // 静态文件为'/', 则不需要传prefix
    * app.use('/', knife4jDoc.serve(), express.static(knife4jDocPath));
-   * 静态文件为'/doc', 则需要传'/doc'
+   * // 静态文件为'/doc', 则需要传'/doc'
    * app.use('/doc', knife4jDoc.serve('/doc'), express.static(knife4jDocPath));
    * ```
    * @returns {(req: any, res: any, next: any) => void} Express 中间件函数
@@ -216,10 +216,10 @@ export class Knife4jDoc {
    * ```javascript
    * const knife4jDoc = new Knife4jDoc(swaggerSpec);
    * const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
-   * 静态文件为'/', 则不需要传prefix
+   * // 静态文件为'/', 则不需要传prefix
    * app.use(knife4jDoc.serveKoa());
    * app.use(koaStatic(knife4jDocPath));
-   * 静态文件为'/doc', 则需要传'/doc'
+   * // 静态文件为'/doc', 则需要传'/doc'
    * app.use(koaMount('/doc', knife4jDoc.serveKoa('/doc')));
    * app.use(koaMount('/doc', koaStatic(knife4jDocPath)));
    * ```

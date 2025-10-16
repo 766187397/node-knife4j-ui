@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-repo/knife4j-ui.git"
+    "url": "git+https://github.com/766187397/node-knife4j-ui.git"
   },
   "files": [
     "dist",

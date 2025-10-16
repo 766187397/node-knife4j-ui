@@ -18,15 +18,16 @@ npm install node-knife4j-ui
 
 ## 快速开始
 
-### 基本使用
+### express版本使用
 
-`express版本`
+> 个人测试node版本16
 
 ```javascript
 const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const Knife4jDoc = require('node-knife4j-ui');
+// const Knife4jDoc = require('node-knife4j-ui').default;
+import Knife4jDoc from 'node-knife4j-ui';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -67,7 +68,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const knife4jDoc = new Knife4jDoc(swaggerSpec);
 const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
 // 暴露静态文件服务
-app.use('/doc', knife4jDoc.serve('/doc'), express.static(knife4jDocPath));
+app.use('/doc', knife4jDoc.serveExpress('/doc'), express.static(knife4jDocPath));
 
 /**
  * @swagger
@@ -128,4 +129,132 @@ module.exports = app;
 ```
 
 
+
+### koa版本使用
+
+> 个人测试node版本20，koa静态文件得使用18+才能正常使用
+
+```javascript
+const Koa = require('koa');
+const Router = require('koa-router');
+const bodyParser = require('koa-bodyparser');
+const cors = require('@koa/cors');
+const swaggerJsdoc = require('swagger-jsdoc');
+const koaSwagger = require('koa2-swagger-ui');
+const Knife4jDoc = require('node-knife4j-ui');
+const serve = require('koa-static');
+
+const app = new Koa();
+const router = new Router();
+const PORT = process.env.PORT || 3001;
+
+// 中间件
+app.use(cors());
+app.use(bodyParser());
+
+// Swagger配置选项
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Koa测试API',
+      version: '1.0.0',
+      description: '一个简单的Koa API测试服务',
+      contact: {
+        name: 'API支持',
+        email: 'support@example.com'
+      }
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: '开发服务器'
+      }
+    ]
+  },
+  apis: ['./koa-app.js'] // 指定包含JSDoc注释的文件
+};
+
+// 生成Swagger规范
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// 提供Swagger UI
+const swaggerUi = koaSwagger.koaSwagger({
+  routePrefix: '/swagger',
+  swaggerOptions: {
+    spec: swaggerSpec
+  },
+});
+
+// 提供 Knife4j 文档
+const knife4jDoc = new Knife4jDoc(swaggerSpec);
+const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
+app.use(knife4jDoc.serveKoa());
+// 暴露静态文件服务
+app.use(serve(knife4jDocPath));
+
+/**
+ * @swagger
+ * /test:
+ *   get:
+ *     summary: 测试接口
+ *     description: 返回简单的问候信息
+ *     tags:
+ *       - 测试
+ *     responses:
+ *       200:
+ *         description: 成功返回问候信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 你好！
+ */
+router.get('/test', (ctx) => {
+  ctx.body = { message: '你好！' };
+});
+
+/**
+ * @swagger
+ * /getSwaggerSpec:
+ *   get:
+ *     summary: 获取Swagger规范
+ *     description: 返回完整的Swagger规范对象
+ *     tags:
+ *       - Swagger
+ *     responses:
+ *       200:
+ *         description: 成功返回Swagger规范
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 swaggerSpec:
+ *                   type: object
+ *                   description: Swagger规范对象
+ */
+router.get('/getSwaggerSpec', (ctx) => {
+  ctx.body = { swaggerSpec };
+});
+
+// 应用路由
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+// 应用Swagger UI
+app.use(swaggerUi);
+
+// 启动服务器
+app.listen(PORT, () => {
+  console.log(`Koa服务器运行在 http://localhost:${PORT}`);
+  console.log(`Swagger文档地址: http://localhost:${PORT}/swagger`);
+  console.log(`Knife4j文档地址: http://localhost:${PORT}/doc`);
+});
+
+module.exports = app;
+```
 
