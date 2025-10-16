@@ -1,6 +1,6 @@
 # node-knife4j-ui
 
-> 一个用于在Node.js应用中集成Knife4j UI界面的中间件，可以方便地展示Swagger/OpenAPI文档。
+> 一个用于在Node.js应用中集成Knife4j UI界面的中间件，可以方便地展示Swagger/OpenAPI文档。对 CommonJS 和 ES Modules 的双重支持。
 
 ## 特性
 
@@ -25,6 +25,32 @@ npm install node-knife4j-ui
 
 
 ![](examples/images/test.png)
+
+
+
+## 引入方式
+
+### CommonJS
+
+```javascript
+const { Knife4jDoc } = require('node-knife4j-ui');
+const knife4jDoc = new Knife4jDoc(swaggerSpec);
+// 或者
+const Knife4jDoc = require('node-knife4j-ui').default;
+const knife4jDoc = new Knife4jDoc(swaggerSpec);
+```
+
+
+
+### ES Modules
+
+```javascript
+import Knife4jDoc from 'node-knife4j-ui';
+const knife4jDoc = new Knife4jDoc(swaggerSpec);
+// 或者
+import { Knife4jDoc } from 'node-knife4j-ui';
+const knife4jDoc = new Knife4jDoc(swaggerSpec);
+```
 
 
 
