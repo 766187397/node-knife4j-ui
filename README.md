@@ -16,6 +16,18 @@
 npm install node-knife4j-ui
 ```
 
+
+
+## 示例图片
+
+![](examples/images/home.png)
+
+
+
+![](examples/images/test.png)
+
+
+
 ## 快速开始
 
 ### express版本使用
