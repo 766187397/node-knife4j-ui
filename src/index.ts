@@ -210,6 +210,167 @@ export class Knife4jDoc {
   }
 
   /**
+   * 服务 Knife4j 文档接口，返回 Koa 中间件函数
+   * @param {string} [prefix=''] - 路径前缀，默认为空字符串，要求和 静态文件路径前缀一致，如果静态文件路径为'/'，则不需要传
+   * 示例：
+   * ```javascript
+   * const knife4jDoc = new Knife4jDoc(swaggerSpec);
+   * const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
+   * 静态文件为'/', 则不需要传prefix
+   * app.use(knife4jDoc.serveKoa());
+   * app.use(koaStatic(knife4jDocPath));
+   * 静态文件为'/doc', 则需要传'/doc'
+   * app.use(koaMount('/doc', knife4jDoc.serveKoa('/doc')));
+   * app.use(koaMount('/doc', koaStatic(knife4jDocPath)));
+   * ```
+   * @returns {(ctx: any, next: any) => Promise<void>} Koa 中间件函数
+   */
+  serveKoa(prefix: string = ""): (ctx: any, next: any) => Promise<void> {
+    // 保存swaggerJson引用，避免this上下文问题
+    const swaggerJson = this.swaggerJson;
+
+    return async (ctx: any, next: any): Promise<void> => {
+      // 检查swaggerJson是否有效
+      if (!swaggerJson || typeof swaggerJson !== "object") {
+        console.error("Knife4jDoc: swaggerJson is invalid or undefined");
+        ctx.status = 500;
+        ctx.body = {
+          error: "Swagger configuration is not available",
+          message: "Please check if swaggerJson was properly passed to Knife4jDoc constructor",
+        };
+        return;
+      }
+
+      const swaggerDocs = swaggerJson;
+      const groupName = ctx.query.groupName || "全部";
+
+      // knife4j 接口文档配置
+      if (ctx.url === "/v3/api-docs/swagger-config") {
+        const groups = [
+          {
+            name: "全部",
+            location: `${prefix}/api-docs/全部`,
+            url: `${prefix}/api-docs/全部`,
+            swaggerVersion: "3.0.0",
+            servicePath: "",
+          },
+        ];
+
+        // 遍历所有路径，提取分组信息
+        const uniqueTags = new Set<string>();
+        if (swaggerDocs.paths) {
+          for (const path in swaggerDocs.paths) {
+            if (swaggerDocs.paths.hasOwnProperty(path)) {
+              const pathObject = swaggerDocs.paths[path];
+              for (const method in pathObject) {
+                if (pathObject.hasOwnProperty(method)) {
+                  const operation = pathObject[method];
+                  if (operation && operation.tags) {
+                    operation.tags.forEach((tag: string) => {
+                      uniqueTags.add(tag);
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // 生成分组资源
+        uniqueTags.forEach((tag: string) => {
+          groups.push({
+            name: tag,
+            location: `${prefix}/api-docs/${tag}`,
+            url: `${prefix}/api-docs/${tag}`,
+            swaggerVersion: "3.0.0",
+            servicePath: "",
+          });
+        });
+
+        swaggerDocs.urls = groups;
+        ctx.type = "application/json";
+        ctx.body = swaggerDocs;
+        return;
+      } else if (ctx.url === "/swagger-resources") {
+        const groups = [
+          {
+            name: "全部",
+            location: `${prefix}/api-docs/全部`,
+            url: `${prefix}/api-docs/全部`,
+            swaggerVersion: "3.0.0",
+            servicePath: "",
+          },
+        ];
+
+        // 遍历所有路径，提取分组信息
+        const uniqueTags = new Set<string>();
+        if (swaggerDocs.paths) {
+          for (const path in swaggerDocs.paths) {
+            if (swaggerDocs.paths.hasOwnProperty(path)) {
+              const pathObject = swaggerDocs.paths[path];
+              for (const method in pathObject) {
+                if (pathObject.hasOwnProperty(method)) {
+                  const operation = pathObject[method];
+                  if (operation && operation.tags) {
+                    operation.tags.forEach((tag: string) => {
+                      uniqueTags.add(tag);
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // 生成分组资源
+        uniqueTags.forEach((tag: string) => {
+          groups.push({
+            name: tag,
+            location: `${prefix}/api-docs/${tag}`,
+            url: `${prefix}/api-docs/${tag}`,
+            swaggerVersion: "3.0.0",
+            servicePath: "",
+          });
+        });
+
+        ctx.body = groups;
+        return;
+      } else if (ctx.url.startsWith("/api-docs/")) {
+        const paths = swaggerDocs.paths;
+        const groupPaths: { [key: string]: any } = {};
+
+        if (groupName === "全部") {
+          ctx.body = swaggerDocs;
+          return;
+        }
+
+        if (paths) {
+          for (const path in paths) {
+            if (paths.hasOwnProperty(path)) {
+              const pathObject = paths[path];
+              for (const method in pathObject) {
+                if (pathObject.hasOwnProperty(method)) {
+                  const operation = pathObject[method];
+                  if (operation && operation.tags && operation.tags.includes(groupName)) {
+                    groupPaths[path] = groupPaths[path] || {};
+                    groupPaths[path][method] = operation;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        swaggerDocs.paths = groupPaths;
+        ctx.body = swaggerDocs;
+        return;
+      } else {
+        await next();
+      }
+    };
+  }
+
+  /**
    * 暴露 Knife4j UI 静态资源路径给调用者使用
    * @returns {string} 静态资源路径
    */
