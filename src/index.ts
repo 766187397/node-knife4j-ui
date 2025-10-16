@@ -375,13 +375,10 @@ export class Knife4jDoc {
    * @returns {string} 静态资源路径
    */
   getKnife4jUiPath(): string {
-    return path.join(__dirname, "../static");
+    // 使用 process.cwd() 获取当前工作目录，然后拼接静态资源路径
+    // 这样可以在 ES Modules 和 CommonJS 环境中都正常工作
+    return path.join(process.cwd(), "node_modules/node-knife4j-ui/static");
   }
 }
 
 export default Knife4jDoc;
-
-declare const module: NodeJS.Module;
-if (typeof module !== "undefined" && module.exports) {
-  (module.exports as typeof Knife4jDoc) = Knife4jDoc;
-}

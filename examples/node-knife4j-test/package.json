@@ -6,9 +6,11 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "start:cjs": "node app.cjs",
     "start:koa": "node koa-app.js",
     "dev": "nodemon app.js",
-    "dev:koa": "nodemon koa-app.js"
+    "dev:koa": "nodemon koa-app.js",
+    "dev:cjs": "nodemon app.cjs"
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",
