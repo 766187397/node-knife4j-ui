@@ -23,10 +23,9 @@ npm install node-knife4j-ui
 > 个人测试node版本16
 
 ```javascript
-const express = require('express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-// const Knife4jDoc = require('node-knife4j-ui').default;
+import express from 'express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import Knife4jDoc from 'node-knife4j-ui';
 
 const app = express();
@@ -125,7 +124,7 @@ app.listen(PORT, () => {
   console.log(`Knife4j文档地址: http://localhost:${PORT}/doc`);
 });
 
-module.exports = app;
+export default app;
 ```
 
 
@@ -135,14 +134,14 @@ module.exports = app;
 > 个人测试node版本20，koa静态文件得使用18+才能正常使用
 
 ```javascript
-const Koa = require('koa');
-const Router = require('koa-router');
-const bodyParser = require('koa-bodyparser');
-const cors = require('@koa/cors');
-const swaggerJsdoc = require('swagger-jsdoc');
-const koaSwagger = require('koa2-swagger-ui');
-const Knife4jDoc = require('node-knife4j-ui');
-const serve = require('koa-static');
+import Koa from 'koa';
+import Router from 'koa-router';
+import bodyParser from 'koa-bodyparser';
+import cors from '@koa/cors';
+import swaggerJsdoc from 'swagger-jsdoc';
+import koaSwagger from 'koa2-swagger-ui';
+import Knife4jDoc from 'node-knife4j-ui';
+import serve from 'koa-static';
 
 const app = new Koa();
 const router = new Router();
@@ -255,6 +254,6 @@ app.listen(PORT, () => {
   console.log(`Knife4j文档地址: http://localhost:${PORT}/doc`);
 });
 
-module.exports = app;
+export default app;
 ```
 
