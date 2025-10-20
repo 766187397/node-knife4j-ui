@@ -170,6 +170,8 @@ export default app;
 ### koa版本使用
 
 > 个人测试node版本20，koa静态文件得使用18+才能正常使用
+>
+> koa暴露静态文件不会自动拼接前缀，axios也没有自动拼接前缀写法有一点点不同
 
 ```javascript
 import Koa from 'koa';
@@ -180,6 +182,8 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import koaSwagger from 'koa2-swagger-ui';
 import Knife4jDoc from 'node-knife4j-ui';
 import serve from 'koa-static';
+import mount from 'koa-mount';
+
 
 const app = new Koa();
 const router = new Router();
@@ -226,9 +230,12 @@ const swaggerUi = koaSwagger.koaSwagger({
 // 提供 Knife4j 文档
 const knife4jDoc = new Knife4jDoc(swaggerSpec);
 const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
+// koa没有自动拼接前缀，不用转请求接口的前缀
 app.use(knife4jDoc.serveKoa());
-// 暴露静态文件服务
-app.use(serve(knife4jDocPath));
+// 暴露静态文件服务，没有拼接前缀，需要将静态文件分开弄
+app.use(mount('/doc', serve(knife4jDocPath, { index: 'index.html' })));
+app.use(serve(knife4jDocPath))
+
 
 /**
  * @swagger
