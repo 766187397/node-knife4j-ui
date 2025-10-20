@@ -56,6 +56,18 @@ const knife4jDoc = new Knife4jDoc(swaggerSpec);
 
 ## 快速开始
 
+### 注意事项
+
+> 这个包使用中间件的方式写的接口，个人接口不能和这个包内部的中间件的判断冲突，否则不能正常使用
+
+```javascript
+req.url.endsWith("/v3/api-docs/swagger-config")
+req.url.endsWith("/swagger-resources")
+req.url.startsWith("/api-docs/")
+```
+
+
+
 ### express版本使用
 
 > 个人测试node版本16
@@ -300,5 +312,21 @@ app.listen(PORT, () => {
 });
 
 export default app;
+```
+
+
+
+### nestjs使用
+
+> 得按照自己使用的底层框架使用，下面是express作为底层框架的核心代码，目前ts类型有点对不上，后续有时间改
+
+```typescript
+import Knife4jDoc from "node-knife4j-ui";
+import * as express from "express";
+
+const knife4jDoc = new Knife4jDoc(document as any);
+const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
+// 暴露静态文件服务
+app.use("/test", knife4jDoc.serveExpress("/test"), express.static(knife4jDocPath));
 ```
 

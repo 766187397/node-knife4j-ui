@@ -82,9 +82,8 @@ export class Knife4jDoc {
 
       const swaggerDocs = swaggerJson;
       const groupName = req.query.groupName || "全部";
-
       // knife4j 接口文档配置
-      if (req.url === "/v3/api-docs/swagger-config") {
+      if (req.url.endsWith("/v3/api-docs/swagger-config")) {
         const groups = [
           {
             name: "全部",
@@ -130,7 +129,7 @@ export class Knife4jDoc {
         res.setHeader("Content-Type", "application/json");
         res.json(swaggerDocs);
         return;
-      } else if (req.url === "/swagger-resources") {
+      } else if (req.url.endsWith("/swagger-resources")) {
         const groups = [
           {
             name: "全部",
@@ -245,7 +244,7 @@ export class Knife4jDoc {
       const groupName = ctx.query.groupName || "全部";
 
       // knife4j 接口文档配置
-      if (ctx.url === "/v3/api-docs/swagger-config") {
+      if (ctx.url.endsWith("/v3/api-docs/swagger-config")) {
         const groups = [
           {
             name: "全部",
@@ -291,7 +290,7 @@ export class Knife4jDoc {
         ctx.type = "application/json";
         ctx.body = swaggerDocs;
         return;
-      } else if (ctx.url === "/swagger-resources") {
+      } else if (ctx.url.endsWith("/swagger-resources")) {
         const groups = [
           {
             name: "全部",
