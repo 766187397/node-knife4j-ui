@@ -318,13 +318,16 @@ export default app;
 
 ### nestjs使用
 
-> 得按照自己使用的底层框架使用，下面是express作为底层框架的核心代码，目前ts类型有点对不上，后续有时间改
+> 得按照自己使用的底层框架使用，下面是express作为底层框架的核心代码
 
 ```typescript
+import { SwaggerModule } from "@nestjs/swagger";
 import Knife4jDoc from "node-knife4j-ui";
 import * as express from "express";
 
-const knife4jDoc = new Knife4jDoc(document as any);
+// 创建 Swagger 文档
+const document = SwaggerModule.createDocument(app, SwaggerConfig.swaggerOptions);
+const knife4jDoc = new Knife4jDoc(document);
 const knife4jDocPath = knife4jDoc.getKnife4jUiPath();
 // 暴露静态文件服务
 app.use("/test", knife4jDoc.serveExpress("/test"), express.static(knife4jDocPath));

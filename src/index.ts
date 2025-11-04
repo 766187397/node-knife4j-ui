@@ -1,31 +1,34 @@
 import * as path from "path";
+import type { OpenAPIObject } from "@nestjs/swagger";
 
 /**
  * Swagger/OpenAPI 文档配置接口
  */
-export interface SwaggerJson {
-  openapi?: string;
-  info?: {
-    title?: string;
-    version?: string;
-    description?: string;
-  };
-  paths?: {
-    [path: string]: {
-      [method: string]: {
-        tags?: string[];
-        summary?: string;
+export type SwaggerJson =
+  | OpenAPIObject
+  | {
+      openapi?: string;
+      info?: {
+        title?: string;
+        version?: string;
         description?: string;
-        responses?: {
-          [status: string]: {
+      };
+      paths?: {
+        [path: string]: {
+          [method: string]: {
+            tags?: string[];
+            summary?: string;
             description?: string;
+            responses?: {
+              [status: string]: {
+                description?: string;
+              };
+            };
           };
         };
       };
+      [key: string]: any;
     };
-  };
-  [key: string]: any;
-}
 
 /**
  * Knife4j 文档中间件类
@@ -80,7 +83,7 @@ export class Knife4jDoc {
         return;
       }
 
-      const swaggerDocs = swaggerJson;
+      const swaggerDocs = JSON.parse(JSON.stringify(this.swaggerJson));
       const groupName = req.query.groupName || "全部";
       // knife4j 接口文档配置
       if (req.url.endsWith("/v3/api-docs/swagger-config")) {
@@ -102,7 +105,7 @@ export class Knife4jDoc {
               const pathObject = swaggerDocs.paths[path];
               for (const method in pathObject) {
                 if (pathObject.hasOwnProperty(method)) {
-                  const operation = pathObject[method];
+                  const operation = (pathObject as { [key: string]: any })[method];
                   if (operation && operation.tags) {
                     operation.tags.forEach((tag: string) => {
                       uniqueTags.add(tag);
@@ -240,7 +243,7 @@ export class Knife4jDoc {
         return;
       }
 
-      const swaggerDocs = swaggerJson;
+      const swaggerDocs = JSON.parse(JSON.stringify(this.swaggerJson));
       const groupName = ctx.query.groupName || "全部";
 
       // knife4j 接口文档配置
@@ -263,7 +266,7 @@ export class Knife4jDoc {
               const pathObject = swaggerDocs.paths[path];
               for (const method in pathObject) {
                 if (pathObject.hasOwnProperty(method)) {
-                  const operation = pathObject[method];
+                  const operation = (pathObject as { [key: string]: any })[method];
                   if (operation && operation.tags) {
                     operation.tags.forEach((tag: string) => {
                       uniqueTags.add(tag);

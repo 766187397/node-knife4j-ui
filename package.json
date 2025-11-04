@@ -48,7 +48,11 @@
   "engines": {
     "node": ">=12.0.0"
   },
+  "peerDependencies": {
+    "@nestjs/swagger": ">=7.0.0"
+  },
   "devDependencies": {
+    "@nestjs/swagger": "^11.2.1",
     "@types/node": "^18.0.0",
     "rimraf": "^5.0.0",
     "tsup": "^8.5.0",
