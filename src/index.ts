@@ -37,13 +37,15 @@ export type SwaggerJson =
  */
 export class Knife4jDoc {
   private swaggerJson: SwaggerJson;
+  private name: string;
 
   /**
    * 创建 Knife4j 文档中间件
    * @param {SwaggerJson} [swaggerJson={}] - Swagger JSON 对象
    */
-  constructor(swaggerJson: SwaggerJson = {}) {
+  constructor(swaggerJson: SwaggerJson = {}, name: string = "API接口文档") {
     this.swaggerJson = swaggerJson;
+    this.name = name;
   }
 
   /**
@@ -82,14 +84,13 @@ export class Knife4jDoc {
       }
 
       const swaggerDocs = JSON.parse(JSON.stringify(this.swaggerJson));
-
       if (req.url === "/services.json") {
         const services = [
           {
-            name: "API接口文档",
+            name: this.name,
             url: `${prefix}/swagger.json`,
             location: this.getSwagger(),
-            swaggerVersion: "2.0",
+            swaggerVersion: "3.0",
           },
         ];
         res.json(services);
@@ -134,14 +135,13 @@ export class Knife4jDoc {
       }
 
       const swaggerDocs = JSON.parse(JSON.stringify(this.swaggerJson));
-
       if (ctx.url === "/services.json") {
         const services = [
           {
-            name: "API接口文档",
+            name: this.name,
             url: `${prefix}/swagger.json`,
             location: this.getSwagger(),
-            swaggerVersion: "2.0",
+            swaggerVersion: "3.0",
           },
         ];
         ctx.body = services;

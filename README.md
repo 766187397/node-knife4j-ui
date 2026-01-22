@@ -61,9 +61,11 @@ const knife4jDoc = new Knife4jDoc(swaggerSpec);
 > 这个包使用中间件的方式写的接口，个人接口不能和这个包内部的中间件的判断冲突，否则不能正常使用
 
 ```javascript
+// 1.0.6之前
 req.url.endsWith("/v3/api-docs/swagger-config")
 req.url.endsWith("/swagger-resources")
 req.url.startsWith("/api-docs/")
+// 1.0.6之后
 ```
 
 
