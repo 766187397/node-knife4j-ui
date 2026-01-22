@@ -69,11 +69,9 @@ export class Knife4jDoc {
    * @returns {(req: any, res: any, next: any) => void} Express 中间件函数
    */
   serveExpress(prefix: string = ""): (req: any, res: any, next: any) => void {
-    // 保存swaggerJson引用，避免this上下文问题
     const swaggerJson = this.swaggerJson;
 
     return (req: any, res: any, next: any): void => {
-      // 检查swaggerJson是否有效
       if (!swaggerJson || typeof swaggerJson !== "object") {
         console.error("Knife4jDoc: swaggerJson is invalid or undefined");
         res.status(500).json({
@@ -84,125 +82,19 @@ export class Knife4jDoc {
       }
 
       const swaggerDocs = JSON.parse(JSON.stringify(this.swaggerJson));
-      const groupName = req.query.groupName || "全部";
-      // knife4j 接口文档配置
-      if (req.url.endsWith("/v3/api-docs/swagger-config")) {
-        const groups = [
+
+      if (req.url === "/services.json") {
+        const services = [
           {
-            name: "全部",
-            location: `${prefix}/api-docs/全部`,
-            url: `${prefix}/api-docs/全部`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
+            name: "API接口文档",
+            url: `${prefix}/swagger.json`,
+            location: this.getSwagger(),
+            swaggerVersion: "2.0",
           },
         ];
-
-        // 遍历所有路径，提取分组信息
-        const uniqueTags = new Set<string>();
-        if (swaggerDocs.paths) {
-          for (const path in swaggerDocs.paths) {
-            if (swaggerDocs.paths.hasOwnProperty(path)) {
-              const pathObject = swaggerDocs.paths[path];
-              for (const method in pathObject) {
-                if (pathObject.hasOwnProperty(method)) {
-                  const operation = (pathObject as { [key: string]: any })[method];
-                  if (operation && operation.tags) {
-                    operation.tags.forEach((tag: string) => {
-                      uniqueTags.add(tag);
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // 生成分组资源
-        uniqueTags.forEach((tag: string) => {
-          groups.push({
-            name: tag,
-            location: `${prefix}/api-docs/${tag}`,
-            url: `${prefix}/api-docs/${tag}`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
-          });
-        });
-
-        swaggerDocs.urls = groups;
-        res.setHeader("Content-Type", "application/json");
-        res.json(swaggerDocs);
+        res.json(services);
         return;
-      } else if (req.url.endsWith("/swagger-resources")) {
-        const groups = [
-          {
-            name: "全部",
-            location: `${prefix}/api-docs/全部`,
-            url: `${prefix}/api-docs/全部`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
-          },
-        ];
-
-        // 遍历所有路径，提取分组信息
-        const uniqueTags = new Set<string>();
-        if (swaggerDocs.paths) {
-          for (const path in swaggerDocs.paths) {
-            if (swaggerDocs.paths.hasOwnProperty(path)) {
-              const pathObject = swaggerDocs.paths[path];
-              for (const method in pathObject) {
-                if (pathObject.hasOwnProperty(method)) {
-                  const operation = pathObject[method];
-                  if (operation && operation.tags) {
-                    operation.tags.forEach((tag: string) => {
-                      uniqueTags.add(tag);
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // 生成分组资源
-        uniqueTags.forEach((tag: string) => {
-          groups.push({
-            name: tag,
-            location: `${prefix}/api-docs/${tag}`,
-            url: `${prefix}/api-docs/${tag}`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
-          });
-        });
-
-        res.json(groups);
-        return;
-      } else if (req.url.startsWith("/api-docs/")) {
-        const paths = swaggerDocs.paths;
-        const groupPaths: { [key: string]: any } = {};
-
-        if (groupName === "全部") {
-          res.json(swaggerDocs);
-          return;
-        }
-
-        if (paths) {
-          for (const path in paths) {
-            if (paths.hasOwnProperty(path)) {
-              const pathObject = paths[path];
-              for (const method in pathObject) {
-                if (pathObject.hasOwnProperty(method)) {
-                  const operation = pathObject[method];
-                  if (operation && operation.tags && operation.tags.includes(groupName)) {
-                    groupPaths[path] = groupPaths[path] || {};
-                    groupPaths[path][method] = operation;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        swaggerDocs.paths = groupPaths;
+      } else if (req.url === `${prefix}/swagger.json`) {
         res.json(swaggerDocs);
         return;
       } else {
@@ -228,11 +120,9 @@ export class Knife4jDoc {
    * @returns {(ctx: any, next: any) => Promise<void>} Koa 中间件函数
    */
   serveKoa(prefix: string = ""): (ctx: any, next: any) => Promise<void> {
-    // 保存swaggerJson引用，避免this上下文问题
     const swaggerJson = this.swaggerJson;
 
     return async (ctx: any, next: any): Promise<void> => {
-      // 检查swaggerJson是否有效
       if (!swaggerJson || typeof swaggerJson !== "object") {
         console.error("Knife4jDoc: swaggerJson is invalid or undefined");
         ctx.status = 500;
@@ -244,126 +134,19 @@ export class Knife4jDoc {
       }
 
       const swaggerDocs = JSON.parse(JSON.stringify(this.swaggerJson));
-      const groupName = ctx.query.groupName || "全部";
 
-      // knife4j 接口文档配置
-      if (ctx.url.endsWith("/v3/api-docs/swagger-config")) {
-        const groups = [
+      if (ctx.url === "/services.json") {
+        const services = [
           {
-            name: "全部",
-            location: `${prefix}/api-docs/全部`,
-            url: `${prefix}/api-docs/全部`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
+            name: "API接口文档",
+            url: `${prefix}/swagger.json`,
+            location: this.getSwagger(),
+            swaggerVersion: "2.0",
           },
         ];
-
-        // 遍历所有路径，提取分组信息
-        const uniqueTags = new Set<string>();
-        if (swaggerDocs.paths) {
-          for (const path in swaggerDocs.paths) {
-            if (swaggerDocs.paths.hasOwnProperty(path)) {
-              const pathObject = swaggerDocs.paths[path];
-              for (const method in pathObject) {
-                if (pathObject.hasOwnProperty(method)) {
-                  const operation = (pathObject as { [key: string]: any })[method];
-                  if (operation && operation.tags) {
-                    operation.tags.forEach((tag: string) => {
-                      uniqueTags.add(tag);
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // 生成分组资源
-        uniqueTags.forEach((tag: string) => {
-          groups.push({
-            name: tag,
-            location: `${prefix}/api-docs/${tag}`,
-            url: `${prefix}/api-docs/${tag}`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
-          });
-        });
-
-        swaggerDocs.urls = groups;
-        ctx.type = "application/json";
-        ctx.body = swaggerDocs;
+        ctx.body = services;
         return;
-      } else if (ctx.url.endsWith("/swagger-resources")) {
-        const groups = [
-          {
-            name: "全部",
-            location: `${prefix}/api-docs/全部`,
-            url: `${prefix}/api-docs/全部`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
-          },
-        ];
-
-        // 遍历所有路径，提取分组信息
-        const uniqueTags = new Set<string>();
-        if (swaggerDocs.paths) {
-          for (const path in swaggerDocs.paths) {
-            if (swaggerDocs.paths.hasOwnProperty(path)) {
-              const pathObject = swaggerDocs.paths[path];
-              for (const method in pathObject) {
-                if (pathObject.hasOwnProperty(method)) {
-                  const operation = pathObject[method];
-                  if (operation && operation.tags) {
-                    operation.tags.forEach((tag: string) => {
-                      uniqueTags.add(tag);
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // 生成分组资源
-        uniqueTags.forEach((tag: string) => {
-          groups.push({
-            name: tag,
-            location: `${prefix}/api-docs/${tag}`,
-            url: `${prefix}/api-docs/${tag}`,
-            swaggerVersion: "3.0.0",
-            servicePath: "",
-          });
-        });
-
-        ctx.body = groups;
-        return;
-      } else if (ctx.url.startsWith("/api-docs/")) {
-        const paths = swaggerDocs.paths;
-        const groupPaths: { [key: string]: any } = {};
-
-        if (groupName === "全部") {
-          ctx.body = swaggerDocs;
-          return;
-        }
-
-        if (paths) {
-          for (const path in paths) {
-            if (paths.hasOwnProperty(path)) {
-              const pathObject = paths[path];
-              for (const method in pathObject) {
-                if (pathObject.hasOwnProperty(method)) {
-                  const operation = pathObject[method];
-                  if (operation && operation.tags && operation.tags.includes(groupName)) {
-                    groupPaths[path] = groupPaths[path] || {};
-                    groupPaths[path][method] = operation;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        swaggerDocs.paths = groupPaths;
+      } else if (ctx.url === `${prefix}/swagger.json`) {
         ctx.body = swaggerDocs;
         return;
       } else {
@@ -380,6 +163,10 @@ export class Knife4jDoc {
     // 使用 process.cwd() 获取当前工作目录，然后拼接静态资源路径
     // 这样可以在 ES Modules 和 CommonJS 环境中都正常工作
     return path.join(process.cwd(), "node_modules/node-knife4j-ui/static");
+  }
+
+  private getSwagger() {
+    return path.join(process.cwd(), "static/swagger.json");
   }
 }
 

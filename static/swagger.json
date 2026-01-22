@@ -1,0 +1,35 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API文档示例",
+    "version": "1.0.0",
+    "description": "这是一个示例接口文档，您的接口文档配置有误！"
+  },
+  "paths": {
+    "/example": {
+      "get": {
+        "tags": ["示例"],
+        "summary": "示例接口",
+        "description": "这是一个示例接口文档，您的接口文档配置有误！请检查传入的swaggerJson配置",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "这是一个示例接口文档，您的接口文档配置有误！"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
