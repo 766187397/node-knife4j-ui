@@ -65,7 +65,9 @@ const knife4jDoc = new Knife4jDoc(swaggerSpec);
 req.url.endsWith("/v3/api-docs/swagger-config")
 req.url.endsWith("/swagger-resources")
 req.url.startsWith("/api-docs/")
-// 1.0.6之后
+// 1.1.0之后
+req.url === "/services.json"
+req.url === `${prefix}/swagger.json`
 ```
 
 
