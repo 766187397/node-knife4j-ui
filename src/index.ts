@@ -90,7 +90,7 @@ export class Knife4jDoc {
             name: this.name,
             url: `${prefix}/swagger.json`,
             location: this.getSwagger(),
-            swaggerVersion: "3.0",
+            swaggerVersion: "3.0.0",
           },
         ];
         res.json(services);
@@ -141,7 +141,7 @@ export class Knife4jDoc {
             name: this.name,
             url: `${prefix}/swagger.json`,
             location: this.getSwagger(),
-            swaggerVersion: "3.0",
+            swaggerVersion: "3.0.0",
           },
         ];
         ctx.body = services;
